@@ -1,3 +1,10 @@
+import { type Metadata } from "next";
+import LoginForm from "./LoginForm";
+
+export const metadata: Metadata = {
+  title: "Logowanie",
+};
+
 export default function Page() {
-  return <div>Strona główna</div>;
+  return <LoginForm />;
 }

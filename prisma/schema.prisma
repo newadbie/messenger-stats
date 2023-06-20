@@ -15,7 +15,15 @@ model Session {
 }
 
 model User {
-    id        String @id @default(cuid())
-    firstName String @map("first_name")
-    lastName  String @map("last_name")
+    id        String  @id @default(cuid())
+    email     String  @unique
+    firstName String  @map("first_name")
+    lastName  String  @map("last_name")
+    confirmed Boolean @default(false)
+    role      Role    @default(USER)
+}
+
+enum Role {
+    USER
+    ADMIN
 }
