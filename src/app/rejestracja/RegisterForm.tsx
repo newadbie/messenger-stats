@@ -1,14 +1,22 @@
 "use client";
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FormProvider, useForm } from "react-hook-form";
+import { FormProvider, type SubmitHandler, useForm } from "react-hook-form";
 import { type RegisterSchema, registerSchema } from "schemas/register";
 import FormInput from "app/common/FormInput";
+import CustomButton from "app/common/CustomButton";
+import { api } from "utils/api";
 
 const RegisterForm: React.FC = () => {
+  const { mutate, isLoading } = api.auth.register.useMutation();
+
   const methods = useForm<RegisterSchema>({
     resolver: zodResolver(registerSchema),
   });
+
+  const onSubmit: SubmitHandler<RegisterSchema> = (data) => {
+    //ok
+  };
 
   return (
     <div className="flex flex-col items-center justify-center px-6 py-8 md:h-screen lg:py-0">
@@ -18,7 +26,10 @@ const RegisterForm: React.FC = () => {
             Stwórz konto
           </h1>
           <FormProvider {...methods}>
-            <form className="space-y-4 md:space-y-6" action="#">
+            <form
+              className="space-y-4 md:space-y-6"
+              onSubmit={methods.handleSubmit(onSubmit)}
+            >
               <FormInput<keyof RegisterSchema>
                 name="email"
                 type="email"
@@ -37,12 +48,12 @@ const RegisterForm: React.FC = () => {
                 label="Potwierdź hasło"
                 placeholder="••••••••"
               />
-              <button
+              <CustomButton
                 type="submit"
-                className="w-full rounded-lg bg-primary-600 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-4 focus:ring-primary-800"
-              >
-                Stwórz konto
-              </button>
+                text="Stwórz konto"
+                className="w-full"
+                loading={isLoading}
+              />
               <p className="text-sm font-light text-gray-400">
                 Posiadasz już konto?{" "}
                 <Link

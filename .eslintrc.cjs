@@ -22,6 +22,8 @@ const config = {
     "plugin:@typescript-eslint/recommended",
   ],
   rules: {
+    // It take so much processor so i decided to disable it
+    "@typescript-eslint/no-misused-promises": "off",
     "@typescript-eslint/consistent-type-imports": [
       "warn",
       {
