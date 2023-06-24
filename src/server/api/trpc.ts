@@ -1,29 +1,24 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
-import { getServerSession, type Session } from "next-auth";
 import superjson from "superjson";
 import { ZodError } from "zod";
-import { authOptions, getServerAuthSession } from "server/auth";
 import { prisma } from "server/db";
 import { type NextRequest } from "next/server";
 
 type CreateContextOptions = {
-  session: Session | null;
+  //can be null
 };
 
-const createInnerTRPCContext = (opts: CreateContextOptions) => {
+const createInnerTRPCContext = (_opts?: CreateContextOptions) => {
   return {
-    session: opts.session,
     prisma,
   };
 };
 
-export const createTRPCContext = async (req: NextRequest) => {
+export const createTRPCContext = (_req: NextRequest) => {
   try {
-    const session = await getServerSession({ ...authOptions, req });
-    return createInnerTRPCContext({ session });
+    return createInnerTRPCContext();
   } catch (e) {
-    console.log("AUUU TUTAJ");
     throw e;
   }
 };
@@ -47,13 +42,13 @@ export const createTRPCRouter = t.router;
 export const publicProcedure = t.procedure;
 
 const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
-  if (!ctx.session || !ctx.session.user) {
-    throw new TRPCError({ code: "UNAUTHORIZED" });
-  }
+  // if (!ctx.session || !ctx.session.user) {
+  //   throw new TRPCError({ code: "UNAUTHORIZED" });
+  // }
   return next({
     ctx: {
       // infers the `session` as non-nullable
-      session: { ...ctx.session, user: ctx.session.user },
+      // session: { ...ctx.session, user: ctx.session.user },
     },
   });
 });

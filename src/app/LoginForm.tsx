@@ -1,12 +1,29 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { FormProvider, useForm } from "react-hook-form";
+import { FormProvider, type SubmitHandler, useForm } from "react-hook-form";
 import { type LoginSchema, loginSchema } from "schemas/login";
 import FormInput from "./common/FormInput";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { useRouter } from "next/navigation";
 
 const LoginForm: React.FC = () => {
+  const router = useRouter();
   const methods = useForm<LoginSchema>({ resolver: zodResolver(loginSchema) });
+  const supabase = createClientComponentClient();
+  const session = supabase.auth.getSession().then((s) => {
+    console.log(s);
+  });
+
+  const onSubmit: SubmitHandler<LoginSchema> = async ({ email, password }) => {
+    const response = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    router.refresh();
+    console.log(response);
+  };
+
   return (
     <div className="flex flex-col items-center justify-center px-6 py-8 md:h-screen lg:py-0">
       <div className="w-full rounded-lg border border-gray-700 bg-gray-800 shadow sm:max-w-md md:mt-0 xl:p-0">
@@ -15,7 +32,10 @@ const LoginForm: React.FC = () => {
             Zaloguj się na platformę
           </h1>
           <FormProvider {...methods}>
-            <form className="space-y-4 md:space-y-6" action="#">
+            <form
+              className="space-y-4 md:space-y-6"
+              onSubmit={methods.handleSubmit(onSubmit)}
+            >
               <FormInput<keyof LoginSchema>
                 name="email"
                 label="Twój email"

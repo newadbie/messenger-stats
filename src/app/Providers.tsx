@@ -1,3 +1,4 @@
+"use client";
 import TrpcProvider from "./TrpcProvider";
 
 const Providers: React.FC<Layout> = ({ children }) => (
