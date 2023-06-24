@@ -1,6 +1,9 @@
 lockfileVersion: '6.0'
 
 dependencies:
+  '@hookform/resolvers':
+    specifier: ^3.1.1
+    version: 3.1.1(react-hook-form@7.45.0)
   '@next-auth/prisma-adapter':
     specifier: ^1.0.5
     version: 1.0.5(@prisma/client@4.14.0)(next-auth@4.22.1)
@@ -28,6 +31,9 @@ dependencies:
   '@trpc/server':
     specifier: ^10.26.0
     version: 10.26.0
+  classnames:
+    specifier: ^2.3.2
+    version: 2.3.2
   flowbite:
     specifier: ^1.6.6
     version: 1.6.6
@@ -46,9 +52,15 @@ dependencies:
   react-dom:
     specifier: 18.2.0
     version: 18.2.0(react@18.2.0)
+  react-hook-form:
+    specifier: ^7.45.0
+    version: 7.45.0(react@18.2.0)
   superjson:
     specifier: 1.12.2
     version: 1.12.2
+  tailwind-merge:
+    specifier: ^1.13.2
+    version: 1.13.2
   zod:
     specifier: ^3.21.4
     version: 3.21.4
@@ -180,6 +192,14 @@ packages:
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
       tabbable: 6.1.2
+    dev: false
+
+  /@hookform/resolvers@3.1.1(react-hook-form@7.45.0):
+    resolution: {integrity: sha512-tS16bAUkqjITNSvbJuO1x7MXbn7Oe8ZziDTJdA9mMvsoYthnOOiznOTGBYwbdlYBgU+tgpI/BtTU3paRbCuSlg==}
+    peerDependencies:
+      react-hook-form: ^7.0.0
+    dependencies:
+      react-hook-form: 7.45.0(react@18.2.0)
     dev: false
 
   /@humanwhocodes/config-array@0.11.10:
@@ -2781,6 +2801,15 @@ packages:
       scheduler: 0.23.0
     dev: false
 
+  /react-hook-form@7.45.0(react@18.2.0):
+    resolution: {integrity: sha512-AbHeZ4ad+0dEIknSW9dBgIwcvRDfZ1O97sgj75WaMdOX0eg8TBiUf9wxzVkIjZbk76BBIE9lmFOzyD4PN80ZQg==}
+    engines: {node: '>=12.22.0'}
+    peerDependencies:
+      react: ^16.8.0 || ^17 || ^18
+    dependencies:
+      react: 18.2.0
+    dev: false
+
   /react-icons@4.9.0(react@18.2.0):
     resolution: {integrity: sha512-ijUnFr//ycebOqujtqtV9PFS7JjhWg0QU6ykURVHuL4cbofvRCf3f6GMn9+fBktEFQOIVZnuAYLZdiyadRQRFg==}
     peerDependencies:
@@ -3087,6 +3116,10 @@ packages:
 
   /tabbable@6.1.2:
     resolution: {integrity: sha512-qCN98uP7i9z0fIS4amQ5zbGBOq+OSigYeGvPy7NDk8Y9yncqDZ9pRPgfsc2PJIVM9RrJj7GIfuRgmjoUU9zTHQ==}
+    dev: false
+
+  /tailwind-merge@1.13.2:
+    resolution: {integrity: sha512-R2/nULkdg1VR/EL4RXg4dEohdoxNUJGLMnWIQnPKL+O9Twu7Cn3Rxi4dlXkDzZrEGtR+G+psSXFouWlpTyLhCQ==}
     dev: false
 
   /tailwindcss@3.3.0(postcss@8.4.21):

@@ -7,3 +7,5 @@ export const registerSchema = z.object({
   password: z.string().regex(passwordRegex),
   passwordConfirmation: z.string().min(10).max(100),
 });
+
+export type RegisterSchema = z.infer<typeof registerSchema>;
