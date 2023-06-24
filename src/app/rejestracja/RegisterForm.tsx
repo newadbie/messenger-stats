@@ -6,16 +6,23 @@ import { type RegisterSchema, registerSchema } from "schemas/register";
 import FormInput from "app/common/FormInput";
 import CustomButton from "app/common/CustomButton";
 import { api } from "utils/api";
+import { Toaster, toast } from "sonner";
 
 const RegisterForm: React.FC = () => {
   const { mutate, isLoading } = api.auth.register.useMutation();
 
   const methods = useForm<RegisterSchema>({
     resolver: zodResolver(registerSchema),
+    mode: "onBlur",
   });
 
   const onSubmit: SubmitHandler<RegisterSchema> = (data) => {
-    //ok
+    mutate(data, {
+      onError: () => {
+        console.log("Error");
+        toast.error("Nie udało się stworzyć konta");
+      },
+    });
   };
 
   return (
@@ -67,6 +74,7 @@ const RegisterForm: React.FC = () => {
           </FormProvider>
         </div>
       </div>
+      <Toaster richColors theme="dark" />
     </div>
   );
 };

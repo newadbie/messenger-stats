@@ -1,10 +1,11 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
-import { type Session } from "next-auth";
+import { getServerSession, type Session } from "next-auth";
 import superjson from "superjson";
 import { ZodError } from "zod";
-import { getServerAuthSession } from "server/auth";
+import { authOptions, getServerAuthSession } from "server/auth";
 import { prisma } from "server/db";
+import { type NextRequest } from "next/server";
 
 type CreateContextOptions = {
   session: Session | null;
@@ -17,14 +18,14 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
   };
 };
 
-export const createTRPCContext = async (opts: CreateNextContextOptions) => {
-  const { req, res } = opts;
-
-  const session = await getServerAuthSession({ req, res });
-
-  return createInnerTRPCContext({
-    session,
-  });
+export const createTRPCContext = async (req: NextRequest) => {
+  try {
+    const session = await getServerSession({ ...authOptions, req });
+    return createInnerTRPCContext({ session });
+  } catch (e) {
+    console.log("AUUU TUTAJ");
+    throw e;
+  }
 };
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
