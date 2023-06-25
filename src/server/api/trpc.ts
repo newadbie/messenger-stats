@@ -1,23 +1,27 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 import superjson from "superjson";
+import {
+  createRouteHandlerClient,
+  type SupabaseClient,
+} from "@supabase/auth-helpers-nextjs";
 import { ZodError } from "zod";
-import { prisma } from "server/db";
 import { type NextRequest } from "next/server";
+import { cookies } from "next/headers";
 
 type CreateContextOptions = {
   //can be null
+  supabase: SupabaseClient;
 };
 
-const createInnerTRPCContext = (_opts?: CreateContextOptions) => {
-  return {
-    prisma,
-  };
+const createInnerTRPCContext = (opts: CreateContextOptions) => {
+  return opts;
 };
 
 export const createTRPCContext = (_req: NextRequest) => {
   try {
-    return createInnerTRPCContext();
+    const supabase = createRouteHandlerClient({ cookies });
+    return createInnerTRPCContext({ supabase });
   } catch (e) {
     throw e;
   }

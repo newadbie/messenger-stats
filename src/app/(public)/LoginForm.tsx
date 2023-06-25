@@ -3,17 +3,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { FormProvider, type SubmitHandler, useForm } from "react-hook-form";
 import { type LoginSchema, loginSchema } from "schemas/login";
-import FormInput from "./common/FormInput";
+import FormInput from "../common/FormInput";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
+import CustomButton from "../common/CustomButton";
 
 const LoginForm: React.FC = () => {
   const router = useRouter();
   const methods = useForm<LoginSchema>({ resolver: zodResolver(loginSchema) });
   const supabase = createClientComponentClient();
-  const session = supabase.auth.getSession().then((s) => {
-    console.log(s);
-  });
 
   const onSubmit: SubmitHandler<LoginSchema> = async ({ email, password }) => {
     const response = await supabase.auth.signInWithPassword({
@@ -56,12 +54,7 @@ const LoginForm: React.FC = () => {
                   Zapomniałeś hasła?
                 </a>
               </div>
-              <button
-                type="submit"
-                className="w-full rounded-lg bg-primary-600 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-4 focus:ring-primary-800"
-              >
-                Zaloguj
-              </button>
+              <CustomButton type="submit" text="Zaloguj" className="w-full" />
               <p className="text-sm font-light text-gray-400">
                 Nie masz jeszcze konta?{" "}
                 <Link
