@@ -1,16 +1,22 @@
 import { cookies } from "next/headers";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { redirect } from "next/navigation";
+import SignoutBtn from "./SignoutBtn";
 
-export default async function PublicLayout({ children }: Layout) {
+export default async function PrivateLayout({ children }: Layout) {
   const supabase = createServerComponentClient({ cookies });
   const {
     data: { session },
   } = await supabase.auth.getSession();
 
-  if (session) {
-    redirect("/stats");
+  if (!session) {
+    redirect("/");
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      <SignoutBtn />
+      {children}
+    </>
+  );
 }
