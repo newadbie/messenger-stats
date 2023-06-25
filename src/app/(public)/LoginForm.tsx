@@ -7,19 +7,28 @@ import FormInput from "../common/FormInput";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
 import CustomButton from "../common/CustomButton";
+import { useState } from "react";
 
 const LoginForm: React.FC = () => {
+  const [isLoading, setIsLoading] = useState(false);
+
   const router = useRouter();
   const methods = useForm<LoginSchema>({ resolver: zodResolver(loginSchema) });
   const supabase = createClientComponentClient();
 
   const onSubmit: SubmitHandler<LoginSchema> = async ({ email, password }) => {
-    const response = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    router.refresh();
-    console.log(response);
+    try {
+      setIsLoading(true);
+      const response = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      router.refresh();
+      console.log(response);
+    } catch {
+      console.error("Maybe i will catch it in future ");
+    }
+    setIsLoading(false);
   };
 
   return (
@@ -54,7 +63,12 @@ const LoginForm: React.FC = () => {
                   Zapomniałeś hasła?
                 </a>
               </div>
-              <CustomButton type="submit" text="Zaloguj" className="w-full" />
+              <CustomButton
+                loading={isLoading}
+                type="submit"
+                text="Zaloguj"
+                className="w-full"
+              />
               <p className="text-sm font-light text-gray-400">
                 Nie masz jeszcze konta?{" "}
                 <Link
