@@ -9,7 +9,7 @@ export default async function PublicLayout({ children }: Layout) {
   } = await supabase.auth.getSession();
 
   if (session) {
-    redirect("/stats");
+    redirect("/statystyki");
   }
 
   return <>{children}</>;

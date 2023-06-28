@@ -1,16 +1,14 @@
-"use client";
+'use client';
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { httpBatchLink, getFetch, loggerLink } from "@trpc/client";
-import { useState } from "react";
-import superjson from "superjson";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { httpBatchLink, getFetch, loggerLink } from '@trpc/client';
+import { useState } from 'react';
+import superjson from 'superjson';
 
-import { api } from "utils/api";
+import { api } from 'utils/api';
 
-const TrpcProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+const TrpcProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -18,18 +16,18 @@ const TrpcProvider: React.FC<{ children: React.ReactNode }> = ({
           queries: {
             staleTime: 5000,
             retry: false,
-            refetchOnWindowFocus: false,
-          },
-        },
+            refetchOnWindowFocus: false
+          }
+        }
       })
   );
-  const url = "/api/trpc";
+  const url = '/api/trpc';
 
   const [trpcClient] = useState(() =>
     api.createClient({
       links: [
         loggerLink({
-          enabled: () => true,
+          enabled: () => true
         }),
         httpBatchLink({
           url,
@@ -37,12 +35,12 @@ const TrpcProvider: React.FC<{ children: React.ReactNode }> = ({
             const fetch = getFetch();
             return fetch(input, {
               ...init,
-              credentials: "include",
+              credentials: 'include'
             });
-          },
-        }),
+          }
+        })
       ],
-      transformer: superjson,
+      transformer: superjson
     })
   );
   return (

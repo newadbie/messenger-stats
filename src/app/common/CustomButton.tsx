@@ -1,51 +1,43 @@
-"use client";
-import { Button } from "flowbite-react";
-import Link from "next/link";
+'use client';
+import { Button } from 'flowbite-react';
+import Link from 'next/link';
 
 interface IProps {
   text: string;
-  type?: "button" | "submit" | "reset";
+  type?: 'button' | 'submit' | 'reset';
   onClick?: () => void;
   className?: string;
   outline?: boolean;
-  variant?:
-    | "default"
-    | "alternative"
-    | "dark"
-    | "light"
-    | "green"
-    | "red"
-    | "yellow"
-    | "purple";
+  variant?: 'default' | 'alternative' | 'dark' | 'light' | 'green' | 'red' | 'yellow' | 'purple';
   href?: string;
   loading?: boolean;
   gradientDuoTone?:
-    | "cyanToBlue"
-    | "greenToBlue"
-    | "pinkToOrange"
-    | "purpleToBlue"
-    | "purpleToPink"
-    | "redToYellow"
-    | "tealToLime";
+    | 'cyanToBlue'
+    | 'greenToBlue'
+    | 'pinkToOrange'
+    | 'purpleToBlue'
+    | 'purpleToPink'
+    | 'redToYellow'
+    | 'tealToLime';
 }
 
 const CustomButton: React.FC<IProps> = ({
   text,
   onClick,
-  variant = "default",
-  type = "button",
+  variant = 'default',
+  type = 'button',
   className,
   gradientDuoTone,
   outline,
   href,
-  loading,
+  loading
 }) => {
   if (!!href) {
     return (
       <Link legacyBehavior href={href}>
         <Button
           gradientDuoTone={gradientDuoTone}
-          color={variant === "default" ? undefined : variant}
+          color={variant === 'default' ? undefined : variant}
           className={className}
           onClick={onClick}
           type={type}
@@ -60,7 +52,7 @@ const CustomButton: React.FC<IProps> = ({
   return (
     <Button
       gradientDuoTone={gradientDuoTone}
-      color={variant === "default" ? undefined : variant}
+      color={variant === 'default' ? undefined : variant}
       className={className}
       onClick={onClick}
       type={type}
