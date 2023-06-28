@@ -1,6 +1,7 @@
-import { cookies } from "next/headers";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+
 import SignoutBtn from "./SignoutBtn";
 
 export default async function PrivateLayout({ children }: Layout) {

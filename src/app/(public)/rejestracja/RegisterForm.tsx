@@ -1,12 +1,14 @@
 "use client";
-import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
 import { FormProvider, type SubmitHandler, useForm } from "react-hook-form";
-import { type RegisterSchema, registerSchema } from "schemas/register";
-import FormInput from "app/common/FormInput";
-import CustomButton from "app/common/CustomButton";
-import { api } from "utils/api";
 import { Toaster, toast } from "sonner";
+
+import CustomButton from "app/common/CustomButton";
+import FormInput from "app/common/FormInput";
+import { type RegisterSchema, registerSchema } from "schemas/register";
+import { api } from "utils/api";
+
 
 const RegisterForm: React.FC = () => {
   const { mutate, isLoading } = api.auth.register.useMutation();

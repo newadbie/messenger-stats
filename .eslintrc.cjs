@@ -1,38 +1,49 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const path = require("path");
+const path = require('path');
 
 /** @type {import("eslint").Linter.Config} */
 const config = {
   overrides: [
     {
-      files: ["*.ts", "*.tsx"],
+      files: ['*.ts', '*.tsx'],
       parserOptions: {
-        project: path.join(__dirname, "tsconfig.json"),
-      },
-    },
+        project: path.join(__dirname, 'tsconfig.json')
+      }
+    }
   ],
-  parser: "@typescript-eslint/parser",
+  parser: '@typescript-eslint/parser',
   parserOptions: {
-    project: path.join(__dirname, "tsconfig.json"),
+    project: path.join(__dirname, 'tsconfig.json')
   },
-  plugins: ["@typescript-eslint"],
+  plugins: ['@typescript-eslint'],
   extends: [
-    "next/core-web-vitals",
-    "plugin:@typescript-eslint/recommended-requiring-type-checking",
-    "plugin:@typescript-eslint/recommended",
+    'next/core-web-vitals',
+    'plugin:@typescript-eslint/recommended-requiring-type-checking',
+    'plugin:@typescript-eslint/recommended'
   ],
   rules: {
-    // It take so much processor so i decided to disable it
-    "@typescript-eslint/no-misused-promises": "off",
-    "@typescript-eslint/consistent-type-imports": [
-      "warn",
+    '@typescript-eslint/no-unused-vars': ['off', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+    '@typescript-eslint/no-explicit-any': 'error',
+    'import/order': [
+      'error',
       {
-        prefer: "type-imports",
-        fixStyle: "inline-type-imports",
-      },
+        groups: ['builtin', 'external', 'internal'],
+        'newlines-between': 'always',
+        pathGroups: [{ pattern: '**/*.scss', group: 'internal', position: 'after' }],
+        pathGroupsExcludedImportTypes: ['react'],
+        alphabetize: { order: 'asc', caseInsensitive: true }
+      }
     ],
-    "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
-  },
+    // It take so much processor so i decided to disable it
+    '@typescript-eslint/no-misused-promises': 'off',
+    '@typescript-eslint/consistent-type-imports': [
+      'warn',
+      {
+        prefer: 'type-imports',
+        fixStyle: 'inline-type-imports'
+      }
+    ]
+  }
 };
 
 module.exports = config;

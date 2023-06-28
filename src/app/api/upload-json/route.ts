@@ -2,8 +2,9 @@ import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { jsonAddSchema } from 'schemas/jsonAdd';
 import superjson from 'superjson';
+
+import { jsonAddSchema } from 'schemas/jsonAdd';
 
 export async function POST(request: Request) {
   const supabase = createRouteHandlerClient({ cookies });
