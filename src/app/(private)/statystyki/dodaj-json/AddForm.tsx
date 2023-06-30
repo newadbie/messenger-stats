@@ -6,12 +6,13 @@ import { toast } from 'sonner';
 
 import CustomButton from 'app/common/CustomButton';
 import FormDropzone from 'app/common/FormDropzone';
+import FormInput from 'app/common/FormInput';
 import { type JsonAddInput, jsonAddSchema } from 'schemas/jsonAdd';
-
 
 const postAddJson = async (data: JsonAddInput) => {
   const formData = new FormData();
   formData.append('file', data.file);
+  formData.append('name', data.name);
 
   try {
     const response = await fetch('/api/upload-json', {
@@ -45,7 +46,8 @@ const AddForm: React.FC = () => {
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={methods.handleSubmit(onSubmit)} className="flex w-full flex-col">
+      <form onSubmit={methods.handleSubmit(onSubmit)} className="flex w-full flex-col space-y-4">
+        <FormInput<keyof JsonAddInput> name="name" label="Tytuł importu" />
         <FormDropzone<keyof JsonAddInput> name="file" />
         <CustomButton text="Wyślij" type="submit" className="mt-4" loading={isLoading} />
       </form>

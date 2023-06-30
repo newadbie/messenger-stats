@@ -1,25 +1,381 @@
 generator client {
-    provider = "prisma-client-js"
+    provider        = "prisma-client-js"
+    previewFeatures = ["multiSchema"]
 }
 
 datasource db {
     provider  = "postgresql"
     url       = env("DATABASE_URL")
     directUrl = env("DIRECT_URL")
+    schemas   = ["auth", "public"]
 }
 
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model audit_log_entries {
+    instance_id String?   @db.Uuid
+    id          String    @id @db.Uuid
+    payload     Json?     @db.Json
+    createdAt   DateTime? @map("created_at") @db.Timestamptz(6)
+    ip_address  String    @default("") @db.VarChar(64)
+
+    @@index([instance_id], map: "audit_logs_instance_id_idx")
+    @@schema("auth")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model flow_state {
+    id                     String                @id @db.Uuid
+    user_id                String?               @db.Uuid
+    auth_code              String
+    code_challenge_method  code_challenge_method
+    code_challenge         String
+    provider_type          String
+    provider_access_token  String?
+    provider_refresh_token String?
+    createdAt              DateTime?             @map("created_at") @db.Timestamptz(6)
+    updated_at             DateTime?             @db.Timestamptz(6)
+    authentication_method  String
+
+    @@index([createdAt(sort: Desc)])
+    @@index([auth_code], map: "idx_auth_code")
+    @@index([user_id, authentication_method], map: "idx_user_id_auth_method")
+    @@schema("auth")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model identities {
+    id              String
+    user_id         String    @db.Uuid
+    identity_data   Json
+    provider        String
+    last_sign_in_at DateTime? @db.Timestamptz(6)
+    createdAt       DateTime? @map("created_at") @db.Timestamptz(6)
+    updated_at      DateTime? @db.Timestamptz(6)
+    email           String?   @default(dbgenerated("lower((identity_data ->> 'email'::text))"))
+    user            User      @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+    @@id([provider, id])
+    @@index([email])
+    @@index([user_id])
+    @@schema("auth")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model instances {
+    id              String    @id @db.Uuid
+    uuid            String?   @db.Uuid
+    raw_base_config String?
+    createdAt       DateTime? @map("created_at") @db.Timestamptz(6)
+    updated_at      DateTime? @db.Timestamptz(6)
+
+    @@schema("auth")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model mfa_amr_claims {
+    session_id            String   @db.Uuid
+    createdAt             DateTime @map("created_at") @db.Timestamptz(6)
+    updated_at            DateTime @db.Timestamptz(6)
+    authentication_method String
+    id                    String   @id(map: "amr_id_pk") @db.Uuid
+    session               Session  @relation(fields: [session_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+    @@unique([session_id, authentication_method], map: "mfa_amr_claims_session_id_authentication_method_pkey")
+    @@schema("auth")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model mfa_challenges {
+    id          String      @id @db.Uuid
+    factor_id   String      @db.Uuid
+    createdAt   DateTime    @map("created_at") @db.Timestamptz(6)
+    verified_at DateTime?   @db.Timestamptz(6)
+    ip_address  String      @db.Inet
+    mfa_factors mfa_factors @relation(fields: [factor_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "mfa_challenges_auth_factor_id_fkey")
+
+    @@index([createdAt(sort: Desc)], map: "mfa_challenge_createdAt_idx")
+    @@schema("auth")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model mfa_factors {
+    id             String           @id @db.Uuid
+    user_id        String           @db.Uuid
+    friendly_name  String?
+    factor_type    factor_type
+    status         factor_status
+    createdAt      DateTime         @map("created_at") @db.Timestamptz(6)
+    updated_at     DateTime         @db.Timestamptz(6)
+    secret         String?
+    mfa_challenges mfa_challenges[]
+    users          User             @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+    @@index([user_id, createdAt], map: "factor_id_createdAt_idx")
+    @@schema("auth")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model refresh_tokens {
+    instance_id String?   @db.Uuid
+    id          BigInt    @id @default(autoincrement())
+    token       String?   @unique(map: "refresh_tokens_token_unique") @db.VarChar(255)
+    user_id     String?   @db.VarChar(255)
+    revoked     Boolean?
+    createdAt   DateTime? @map("created_at") @db.Timestamptz(6)
+    updated_at  DateTime? @db.Timestamptz(6)
+    parent      String?   @db.VarChar(255)
+    session_id  String?   @db.Uuid
+    session     Session?  @relation(fields: [session_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+    @@index([instance_id])
+    @@index([instance_id, user_id])
+    @@index([parent])
+    @@index([session_id, revoked])
+    @@index([updated_at(sort: Desc)])
+    @@schema("auth")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model saml_providers {
+    id                String        @id @db.Uuid
+    sso_provider_id   String        @db.Uuid
+    entity_id         String        @unique
+    metadata_xml      String
+    metadata_url      String?
+    attribute_mapping Json?
+    createdAt         DateTime?     @map("created_at") @db.Timestamptz(6)
+    updated_at        DateTime?     @db.Timestamptz(6)
+    sso_providers     sso_providers @relation(fields: [sso_provider_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+    @@index([sso_provider_id])
+    @@schema("auth")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model saml_relay_states {
+    id              String        @id @db.Uuid
+    sso_provider_id String        @db.Uuid
+    request_id      String
+    for_email       String?
+    redirect_to     String?
+    from_ip_address String?       @db.Inet
+    createdAt       DateTime?     @map("created_at") @db.Timestamptz(6)
+    updated_at      DateTime?     @db.Timestamptz(6)
+    sso_providers   sso_providers @relation(fields: [sso_provider_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+    @@index([createdAt(sort: Desc)])
+    @@index([for_email])
+    @@index([sso_provider_id])
+    @@schema("auth")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model schema_migrations {
+    version String @id @db.VarChar(255)
+
+    @@schema("auth")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model Session {
+    id             String           @id @db.Uuid
+    user_id        String           @db.Uuid
+    createdAt      DateTime?        @map("created_at") @db.Timestamptz(6)
+    updated_at     DateTime?        @db.Timestamptz(6)
+    factor_id      String?          @db.Uuid
+    aal            aal_level?
+    not_after      DateTime?        @db.Timestamptz(6)
+    mfa_amr_claims mfa_amr_claims[]
+    refresh_tokens refresh_tokens[]
+    user           User             @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+    @@index([not_after(sort: Desc)])
+    @@index([user_id])
+    @@index([user_id, createdAt], map: "user_id_createdAt_idx")
+    @@map("sessions")
+    @@schema("auth")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model sso_domains {
+    id              String        @id @db.Uuid
+    sso_provider_id String        @db.Uuid
+    domain          String
+    createdAt       DateTime?     @map("created_at") @db.Timestamptz(6)
+    updated_at      DateTime?     @db.Timestamptz(6)
+    sso_providers   sso_providers @relation(fields: [sso_provider_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+    @@index([sso_provider_id])
+    @@schema("auth")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model sso_providers {
+    id                String              @id @db.Uuid
+    resource_id       String?
+    createdAt         DateTime?           @map("created_at") @db.Timestamptz(6)
+    updated_at        DateTime?           @db.Timestamptz(6)
+    saml_providers    saml_providers[]
+    saml_relay_states saml_relay_states[]
+    sso_domains       sso_domains[]
+
+    @@schema("auth")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model User {
+    instance_id                 String?       @db.Uuid
+    id                          String        @id @db.Uuid
+    aud                         String?       @db.VarChar(255)
+    role                        String?       @db.VarChar(255)
+    email                       String?       @db.VarChar(255)
+    encrypted_password          String?       @db.VarChar(255)
+    email_confirmed_at          DateTime?     @db.Timestamptz(6)
+    invited_at                  DateTime?     @db.Timestamptz(6)
+    confirmation_token          String?       @db.VarChar(255)
+    confirmation_sent_at        DateTime?     @db.Timestamptz(6)
+    recovery_token              String?       @db.VarChar(255)
+    recovery_sent_at            DateTime?     @db.Timestamptz(6)
+    email_change_token_new      String?       @db.VarChar(255)
+    email_change                String?       @db.VarChar(255)
+    email_change_sent_at        DateTime?     @db.Timestamptz(6)
+    last_sign_in_at             DateTime?     @db.Timestamptz(6)
+    raw_app_meta_data           Json?
+    raw_user_meta_data          Json?
+    is_super_admin              Boolean?
+    createdAt                   DateTime?     @map("created_at") @db.Timestamptz(6)
+    updated_at                  DateTime?     @db.Timestamptz(6)
+    phone                       String?       @unique
+    phone_confirmed_at          DateTime?     @db.Timestamptz(6)
+    phone_change                String?       @default("")
+    phone_change_token          String?       @default("") @db.VarChar(255)
+    phone_change_sent_at        DateTime?     @db.Timestamptz(6)
+    confirmed_at                DateTime?     @default(dbgenerated("LEAST(email_confirmed_at, phone_confirmed_at)")) @db.Timestamptz(6)
+    email_change_token_current  String?       @default("") @db.VarChar(255)
+    email_change_confirm_status Int?          @default(0) @db.SmallInt
+    banned_until                DateTime?     @db.Timestamptz(6)
+    reauthentication_token      String?       @default("") @db.VarChar(255)
+    reauthentication_sent_at    DateTime?     @db.Timestamptz(6)
+    is_sso_user                 Boolean       @default(false)
+    deletedAt                   DateTime?     @map("deleted_at") @db.Timestamptz(6)
+    identities                  identities[]
+    mfaFactors                  mfa_factors[]
+    sessions                    Session[]
+    userDetails                 UserDetail[]
+    dataImports                 DataImport[]
+
+    @@index([instance_id])
+    @@map("users")
+    @@schema("auth")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model UserDetail {
-    id         Int      @id @default(autoincrement())
-    createdAt  DateTime @default(now()) @map("created_at") @db.Timestamp()
-    userId     String   @unique @map("user_id")
-    confirmed  Boolean  @default(false)
-    canConfirm Boolean  @default(false) @map("can_confirm")
+    id          BigInt    @id @default(autoincrement())
+    createdAt   DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+    confirmed   Boolean   @default(false)
+    userId      String    @unique @map("user_id") @db.Uuid
+    can_confirm Boolean   @default(false)
+    user        User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
     @@map("user_details")
+    @@schema("public")
 }
 
-model DataImports {
-    id Int @id @default(autoincrement())
+model DataImport {
+    id    Int    @id @default(autoincrement())
+    title String @unique @db.VarChar(255)
+
+    createdAt DateTime @default(now()) @map("created_at") @db.Timestamp()
+    authorId  String   @map("author_id") @db.Uuid
+    author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+    firstMessageDate DateTime @map("first_message_date") @db.Timestamp()
+    lastMessageDate  DateTime @map("last_message_date") @db.Timestamp()
+
+    participantDetails ParticipantDetail[]
+    topParticipants    TopParticipant[]
 
     @@map("data_imports")
+    @@schema("public")
+}
+
+model ParticipantDetail {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now()) @map("created_at") @db.Timestamp()
+
+    importId Int        @map("import_id")
+    import   DataImport @relation(fields: [importId], references: [id])
+
+    name              String
+    messagesAmount    Int    @map("messages_amount")
+    givedReactions    Int    @map("gived_reactions")
+    receivedReactions Int    @map("received_reactions")
+    numberOfWords     Int    @map("number_of_words")
+    kWordAmount       Int    @map("k_word_amount")
+    xDWordAmount      Int    @map("xd_word_amount")
+
+    @@map("participant_details")
+    @@schema("public")
+}
+
+model TopParticipant {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now()) @map("created_at") @db.Timestamp()
+
+    importId Int        @map("import_id")
+    import   DataImport @relation(fields: [importId], references: [id])
+
+    name      String
+    photos    Boolean?
+    gifs      Boolean?
+    reactions Int      @default(0)
+    content   String?
+
+    @@map("top_participants")
+    @@schema("public")
+}
+
+enum aal_level {
+    aal1
+    aal2
+    aal3
+
+    @@schema("auth")
+}
+
+enum code_challenge_method {
+    s256
+    plain
+
+    @@schema("auth")
+}
+
+enum factor_status {
+    unverified
+    verified
+
+    @@schema("auth")
+}
+
+enum factor_type {
+    totp
+    webauthn
+
+    @@schema("auth")
+}
+
+enum Role {
+    USER
+    ADMIN
+
+    @@schema("public")
 }

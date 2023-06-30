@@ -16,14 +16,15 @@ export default async function PrivateLayout({ children }: Layout) {
   }
 
   try {
-    const { confirmed } = await prisma.userDetails.findUniqueOrThrow({
+    const { confirmed } = await prisma.userDetail.findUniqueOrThrow({
       where: { userId: session.user.id },
       select: { confirmed: true }
     });
     if (!confirmed) {
       return <h1>Twoje konto nie zostało jeszcze zatwierdzone przez admina</h1>;
     }
-  } catch {
+  } catch (e) {
+    console.log(e);
     return <h1>Nastąpił jakiś bład</h1>;
   }
 

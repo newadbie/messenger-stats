@@ -6,4 +6,28 @@
   body {
     @apply text-white;
   }
+  .heading-1,
+  h1 {
+    @apply text-5xl font-extrabold text-white;
+  }
+  .heading-2,
+  h2 {
+    @apply text-4xl font-bold text-white;
+  }
+  .heading-3,
+  h3 {
+    @apply text-3xl font-bold text-white;
+  }
+  .heading-4,
+  h4 {
+    @apply text-2xl font-bold text-white;
+  }
+  .heading-5,
+  h5 {
+    @apply text-xl font-bold text-white;
+  }
+  .heading-6,
+  h6 {
+    @apply text-lg font-bold text-white;
+  }
 }

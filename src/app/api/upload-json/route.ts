@@ -6,6 +6,7 @@ import superjson from 'superjson';
 import utf8 from 'utf8';
 
 import { jsonAddSchema } from 'schemas/jsonAdd';
+import { prisma } from 'server/db';
 
 interface Reaction {
   reaction: string;
@@ -43,15 +44,24 @@ interface JsonFile {
 }
 
 export async function POST(request: Request) {
-  const supabase = createRouteHandlerClient({ cookies });
-  const session = await supabase.auth.getSession();
-
-  if (!session.data) {
-    return NextResponse.json({ message: ReasonPhrases.UNAUTHORIZED }, { status: StatusCodes.UNAUTHORIZED });
-  }
-
-  const jsonBody: Record<string, unknown> = {};
   try {
+    const supabase = createRouteHandlerClient({ cookies });
+    const session = await supabase.auth.getSession();
+
+    if (!session.data.session?.user.id) {
+      return NextResponse.json({ message: ReasonPhrases.UNAUTHORIZED }, { status: StatusCodes.UNAUTHORIZED });
+    }
+
+    const { confirmed } = await prisma.userDetail.findUniqueOrThrow({
+      where: { userId: session.data.session?.user.id },
+      select: { confirmed: true }
+    });
+
+    if (!confirmed) {
+      return NextResponse.json({ message: ReasonPhrases.FORBIDDEN }, { status: StatusCodes.FORBIDDEN });
+    }
+
+    const jsonBody: Record<string, unknown> = {};
     const body = await request.formData();
     const generator = body.entries();
     let result = generator.next();
@@ -76,7 +86,7 @@ export async function POST(request: Request) {
     }
 
     interface ParticipantMessageDetails {
-      messages: number;
+      messagesAmount: number;
       givedReactions: number;
       receivedReactions: number;
       numberOfWords: number;
@@ -96,7 +106,7 @@ export async function POST(request: Request) {
       participantMessageDetails.set(utf8.decode(participant.name), {
         givedReactions: 0,
         numberOfWords: 0,
-        messages: 0,
+        messagesAmount: 0,
         receivedReactions: 0,
         kWordAmount: 0,
         xDWordAmount: 0
@@ -104,12 +114,12 @@ export async function POST(request: Request) {
     });
 
     // for loop is faster than forEach but forEach is more readable
-    json.messages.forEach((message, index) => {
+    json.messages.forEach((message) => {
       const author = utf8.decode(message.sender_name);
       const details = participantMessageDetails.get(author);
       if (!details) return;
       details.numberOfWords += message.content?.split(' ').length ?? 0;
-      details.messages += 1;
+      details.messagesAmount += 1;
 
       const kWordAmount = message.content?.toLowerCase()?.match(/kurwa/gi)?.length ?? 0;
       const xDAmount = message.content?.toLowerCase()?.match(/xd/gi)?.length ?? 0;
@@ -137,16 +147,37 @@ export async function POST(request: Request) {
       }
     });
 
-    const firstMessageDate = new Date(json.messages.at(-1)?.timestamp_ms ?? 0).toISOString();
-    const lastMessageDate = new Date(json.messages[0]?.timestamp_ms ?? 0).toISOString();
+    const firstMessageDate = new Date(json.messages.at(-1)?.timestamp_ms ?? 0);
+    const lastMessageDate = new Date(json.messages[0]?.timestamp_ms ?? 0);
 
-    console.log(mostReactedMessages);
-  } catch (e) {
-    console.log(e);
+    await prisma.dataImport.create({
+      data: {
+        firstMessageDate,
+        title: json.title,
+        lastMessageDate,
+        authorId: session.data.session.user.id,
+        participantDetails: {
+          createMany: { data: Array.from(participantMessageDetails, ([name, details]) => ({ ...details, name })) }
+        },
+        topParticipants: {
+          createMany: {
+            data: mostReactedMessages.messages.map((message) => ({
+              content: message.content,
+              reactions: mostReactedMessages.numberOfReactions,
+              photos: (message.photos?.length ?? 0) > 0,
+              gifs: (message.gifs?.length ?? 0) > 0,
+              name: message.sender_name
+            }))
+          }
+        }
+      }
+    });
+
+    return NextResponse.json({ message: ReasonPhrases.OK }, { status: StatusCodes.OK });
+  } catch {
     return NextResponse.json(
       { message: ReasonPhrases.INTERNAL_SERVER_ERROR },
       { status: StatusCodes.INTERNAL_SERVER_ERROR }
     );
   }
-  return NextResponse.json({ message: ReasonPhrases.OK }, { status: StatusCodes.OK });
 }
