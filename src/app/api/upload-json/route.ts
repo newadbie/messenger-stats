@@ -1,5 +1,6 @@
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
+import { revalidateTag } from 'next/cache';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import superjson from 'superjson';
@@ -67,17 +68,15 @@ export async function POST(request: Request) {
     let result = generator.next();
     while (!result.done) {
       const [key, value] = result.value;
-      jsonBody[key] = value instanceof Blob ? value : superjson.parse(value.toString());
+      jsonBody[key] = value instanceof Blob ? value : typeof value === 'string' ? value : superjson.parse(value);
       result = generator.next();
     }
-
     const parsedBody = jsonAddSchema.safeParse(jsonBody);
     if (!parsedBody.success) {
       return NextResponse.json({ message: ReasonPhrases.BAD_REQUEST }, { status: StatusCodes.BAD_REQUEST });
     }
 
     const file = parsedBody.data.file;
-
     const buffer = await file.arrayBuffer();
 
     interface MostReactedMessages {
@@ -102,6 +101,7 @@ export async function POST(request: Request) {
 
     // try / catch should catch all type issues
     const json = JSON.parse(new TextDecoder('utf-8').decode(buffer)) as JsonFile;
+    console.log(json);
     json.participants.forEach((participant) => {
       participantMessageDetails.set(utf8.decode(participant.name), {
         givedReactions: 0,
@@ -149,11 +149,10 @@ export async function POST(request: Request) {
 
     const firstMessageDate = new Date(json.messages.at(-1)?.timestamp_ms ?? 0);
     const lastMessageDate = new Date(json.messages[0]?.timestamp_ms ?? 0);
-
     await prisma.dataImport.create({
       data: {
         firstMessageDate,
-        title: json.title,
+        title: utf8.decode(json.title),
         lastMessageDate,
         authorId: session.data.session.user.id,
         participantDetails: {
@@ -173,8 +172,10 @@ export async function POST(request: Request) {
       }
     });
 
+    revalidateTag('stats');
     return NextResponse.json({ message: ReasonPhrases.OK }, { status: StatusCodes.OK });
-  } catch {
+  } catch (e) {
+    console.log(e);
     return NextResponse.json(
       { message: ReasonPhrases.INTERNAL_SERVER_ERROR },
       { status: StatusCodes.INTERNAL_SERVER_ERROR }

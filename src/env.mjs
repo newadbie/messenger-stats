@@ -8,6 +8,7 @@ export const env = createEnv({
     NODE_ENV: z.enum(['development', 'test', 'production']),
     SUPABASE_URL: z.string().url(),
     SUPABASE_KEY: z.string().min(1),
+    API_SECRET: z.string().min(1),
     NEXTAUTH_SECRET: process.env.NODE_ENV === 'production' ? z.string().min(1) : z.string().min(1).optional(),
     NEXTAUTH_URL: z.preprocess(
       (str) => process.env.VERCEL_URL ?? str,
@@ -21,6 +22,7 @@ export const env = createEnv({
   },
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
+    API_SECRET: process.env.API_SECRET,
     DIRECT_URL: process.env.DIRECT_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,

@@ -2,7 +2,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { FormProvider, type SubmitHandler, useForm } from 'react-hook-form';
-import { toast } from 'sonner';
+import { Toaster, toast } from 'sonner';
 
 import CustomButton from 'app/common/CustomButton';
 import FormDropzone from 'app/common/FormDropzone';
@@ -45,13 +45,16 @@ const AddForm: React.FC = () => {
   };
 
   return (
-    <FormProvider {...methods}>
-      <form onSubmit={methods.handleSubmit(onSubmit)} className="flex w-full flex-col space-y-4">
-        <FormInput<keyof JsonAddInput> name="name" label="Tytuł importu" />
-        <FormDropzone<keyof JsonAddInput> name="file" />
-        <CustomButton text="Wyślij" type="submit" className="mt-4" loading={isLoading} />
-      </form>
-    </FormProvider>
+    <>
+      <FormProvider {...methods}>
+        <form onSubmit={methods.handleSubmit(onSubmit)} className="flex w-full flex-col space-y-4">
+          <FormInput<keyof JsonAddInput> name="name" label="Tytuł importu" />
+          <FormDropzone<keyof JsonAddInput> name="file" />
+          <CustomButton text="Wyślij" type="submit" className="mt-4" loading={isLoading} />
+        </form>
+      </FormProvider>
+      <Toaster richColors theme="dark" />
+    </>
   );
 };
 

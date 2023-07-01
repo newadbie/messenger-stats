@@ -1,5 +1,3 @@
-import { Toaster } from 'sonner';
-
 import AddForm from './AddForm';
 
 export default function AddPage() {
@@ -7,7 +5,6 @@ export default function AddPage() {
     <div className="flex flex-grow flex-col items-center justify-center">
       <h1 className="heading-3 mb-2">Wgraj plik JSON</h1>
       <AddForm />
-      <Toaster />
     </div>
   );
 }
