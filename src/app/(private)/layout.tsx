@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 
 import { prisma } from 'server/db';
 
+import Header from './Header';
 import SignoutBtn from './SignoutBtn';
 
 export default async function PrivateLayout({ children }: Layout) {
@@ -30,8 +31,8 @@ export default async function PrivateLayout({ children }: Layout) {
 
   return (
     <>
-      <SignoutBtn />
-      {children}
+      <Header />
+      <div className="mx-auto flex w-full max-w-screen-xl flex-grow flex-col px-5">{children}</div>
     </>
   );
 }

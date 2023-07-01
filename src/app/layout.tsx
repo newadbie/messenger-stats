@@ -7,7 +7,7 @@ export default function RootLayout({ children }: Layout) {
     <html lang="pl" suppressHydrationWarning className="dark">
       <body className="relative bg-gray-900 antialiased">
         <Providers>
-          <div className="mx-auto flex min-h-screen max-w-3xl flex-grow flex-col">{children}</div>
+          <div className="mx-auto flex min-h-screen flex-grow flex-col">{children}</div>
         </Providers>
       </body>
     </html>
