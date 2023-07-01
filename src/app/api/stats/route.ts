@@ -14,7 +14,25 @@ export interface StatsResponse {
 
 const getImport = () =>
   prisma.dataImport.findMany({
-    include: { author: true, participantDetails: true, topParticipants: true }
+    select: {
+      lastMessageDate: true,
+      firstMessageDate: true,
+      createdAt: true,
+      author: { select: { email: true } },
+      title: true,
+      participantDetails: {
+        select: {
+          kWordAmount: true,
+          givedReactions: true,
+          messagesAmount: true,
+          name: true,
+          numberOfWords: true,
+          receivedReactions: true,
+          xDWordAmount: true
+        }
+      },
+      topParticipants: { select: { name: true, content: true, gifs: true, photos: true, reactions: true } }
+    }
   });
 
 export async function GET(request: Request) {
@@ -23,5 +41,6 @@ export async function GET(request: Request) {
     return NextResponse.json({ message: ReasonPhrases.UNAUTHORIZED }, { status: StatusCodes.UNAUTHORIZED });
   }
   const stats = await getImport();
-  return NextResponse.json(superjson.stringify(stats), { status: StatusCodes.OK });
+  const sortedStats = stats.map((stat) => stat.participantDetails.sort((a, b) => b.messagesAmount - a.messagesAmount));
+  return NextResponse.json(superjson.stringify(sortedStats), { status: StatusCodes.OK });
 }

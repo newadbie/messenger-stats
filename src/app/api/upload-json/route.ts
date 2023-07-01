@@ -152,7 +152,7 @@ export async function POST(request: Request) {
     await prisma.dataImport.create({
       data: {
         firstMessageDate,
-        title: utf8.decode(json.title),
+        title: parsedBody.data.name,
         lastMessageDate,
         authorId: session.data.session.user.id,
         participantDetails: {

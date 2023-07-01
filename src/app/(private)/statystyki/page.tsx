@@ -16,6 +16,7 @@ const getStats = async () => {
     });
     return response;
   } catch (e) {
+    //TODO: work with errors
     console.log(e);
     return null;
   }
@@ -29,9 +30,9 @@ export default async function Stats() {
   }
 
   return (
-    <div>
-      <h1>Stats</h1>
+    <>
+      <h1>Statystyki</h1>
       <pre>{JSON.stringify(stats, null, 2)}</pre>
-    </div>
+    </>
   );
 }
