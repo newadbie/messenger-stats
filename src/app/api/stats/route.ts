@@ -8,8 +8,8 @@ import { env } from 'env.mjs';
 import { prisma } from 'server/db';
 
 export interface StatsResponse {
-  stats: ReturnType<Awaited<typeof getImport>>;
-  message: 'ok';
+  stats: Awaited<ReturnType<typeof getImport>>;
+  status: 200;
 }
 
 const getImport = () =>
@@ -18,7 +18,7 @@ const getImport = () =>
       lastMessageDate: true,
       firstMessageDate: true,
       createdAt: true,
-      author: { select: { email: true } },
+      author: { select: { email: true, raw_user_meta_data: true } },
       title: true,
       participantDetails: {
         select: {
@@ -41,6 +41,9 @@ export async function GET(request: Request) {
     return NextResponse.json({ message: ReasonPhrases.UNAUTHORIZED }, { status: StatusCodes.UNAUTHORIZED });
   }
   const stats = await getImport();
-  const sortedStats = stats.map((stat) => stat.participantDetails.sort((a, b) => b.messagesAmount - a.messagesAmount));
-  return NextResponse.json(superjson.stringify(sortedStats), { status: StatusCodes.OK });
+  const sortedStats = stats.map((stat) => ({
+    ...stat,
+    participantDetails: stat.participantDetails.sort((a, b) => b.messagesAmount - a.messagesAmount)
+  }));
+  return NextResponse.json(superjson.stringify({ stats: sortedStats }), { status: StatusCodes.OK });
 }

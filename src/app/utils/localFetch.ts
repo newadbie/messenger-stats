@@ -34,7 +34,6 @@ export const localFetch = async <T = unknown>(
     throw response.status;
   }
   const result = (await response.json()) as string;
-  console.log(result);
   const parsedResult = superjson.parse<T>(result);
   return typeof result === 'string'
     ? { data: parsedResult, status: response.status }

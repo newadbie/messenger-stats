@@ -1,20 +1,21 @@
-import z from "zod";
+import z from 'zod';
 
 const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/;
 
 export const registerSchema = z
   .object({
     email: z.string().email(),
+    username: z.string().min(1)
   })
   .and(
     z
       .object({
         password: z.string().regex(passwordRegex),
-        passwordConfirmation: z.string().min(1),
+        passwordConfirmation: z.string().min(1)
       })
       .refine((data) => data.password === data.passwordConfirmation, {
-        message: "Passwords do not match",
-        path: ["passwordConfirmation"],
+        message: 'Passwords do not match',
+        path: ['passwordConfirmation']
       })
   );
 

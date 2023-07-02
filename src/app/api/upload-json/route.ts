@@ -101,7 +101,6 @@ export async function POST(request: Request) {
 
     // try / catch should catch all type issues
     const json = JSON.parse(new TextDecoder('utf-8').decode(buffer)) as JsonFile;
-    console.log(json);
     json.participants.forEach((participant) => {
       participantMessageDetails.set(utf8.decode(participant.name), {
         givedReactions: 0,

@@ -3,6 +3,8 @@ import { type Metadata } from 'next';
 import { type StatsResponse } from 'app/api/stats/route';
 import { localFetch } from 'app/utils/localFetch';
 
+import StatsTable from './StatsTable';
+
 export const metadata: Metadata = {
   title: 'Statystyki'
 };
@@ -28,11 +30,11 @@ export default async function Stats() {
   if (!stats) {
     return <h1>Jeszcze tu nic nie ma</h1>;
   }
-
+  console.log(stats);
   return (
     <>
-      <h1>Statystyki</h1>
-      <pre>{JSON.stringify(stats, null, 2)}</pre>
+      <h1 className="mb-4">Statystyki</h1>
+      <StatsTable data={stats.data.stats} />
     </>
   );
 }

@@ -7,7 +7,8 @@ export const authRouter = createTRPCRouter({
   register: publicProcedure.input(registerSchema).mutation(async ({ input }) => {
     await supabase.auth.signUp({
       email: input.email,
-      password: input.password
+      password: input.password,
+      options: { data: { username: input.username } }
     });
   })
 });

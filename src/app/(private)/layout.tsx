@@ -32,7 +32,7 @@ export default async function PrivateLayout({ children }: Layout) {
   return (
     <>
       <Header />
-      <div className="mx-auto flex w-full max-w-screen-xl flex-grow flex-col px-5">{children}</div>
+      <div className="mx-auto flex w-full max-w-screen-xl flex-grow flex-col p-5">{children}</div>
     </>
   );
 }
