@@ -1,6 +1,6 @@
 import z from 'zod';
 
-const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/;
+// const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/;
 
 export const registerSchema = z
   .object({
@@ -10,7 +10,7 @@ export const registerSchema = z
   .and(
     z
       .object({
-        password: z.string().regex(passwordRegex),
+        password: z.string().min(8),//.regex(passwordRegex),
         passwordConfirmation: z.string().min(1)
       })
       .refine((data) => data.password === data.passwordConfirmation, {
