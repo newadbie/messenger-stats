@@ -49,17 +49,8 @@ export async function POST(request: Request) {
     const supabase = createRouteHandlerClient({ cookies });
     const session = await supabase.auth.getSession();
 
-    if (!session.data.session?.user.id) {
+    if (!session.data.session?.user.id || !session.data.session.user.user_metadata.confirmed) {
       return NextResponse.json({ message: ReasonPhrases.UNAUTHORIZED }, { status: StatusCodes.UNAUTHORIZED });
-    }
-
-    const { confirmed } = await prisma.userDetail.findUniqueOrThrow({
-      where: { userId: session.data.session?.user.id },
-      select: { confirmed: true }
-    });
-
-    if (!confirmed) {
-      return NextResponse.json({ message: ReasonPhrases.FORBIDDEN }, { status: StatusCodes.FORBIDDEN });
     }
 
     const jsonBody: Record<string, unknown> = {};
