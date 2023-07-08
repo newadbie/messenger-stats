@@ -6,6 +6,6 @@ const globalForPrisma = globalThis as unknown as {
   supabase: SupabaseClient | undefined;
 };
 
-export const supabase = globalForPrisma.supabase ?? createClient(env.SUPABASE_URL, env.SUPABASE_KEY);
+export const supabase = globalForPrisma.supabase ?? createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_SECRET);
 
 if (env.NODE_ENV !== 'production') globalForPrisma.supabase = supabase;

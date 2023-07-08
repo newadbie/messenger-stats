@@ -22,13 +22,13 @@ const Header: React.FC = () => {
           <div className="flex items-center gap-6">
             {session.user.user_metadata.canConfirm && (
               <CustomButton
-                href="/potwierdz-nowych"
+                href="/uzytkownicy"
                 size="xs"
                 className="relative"
                 outline
                 text={
                   <>
-                    <span className="relative z-20">Potwierdź nowych</span>
+                    <span className="relative z-20">Użytkownicy</span>
                     {!!data && (
                       <div className="absolute -bottom-2 -left-2 z-10 inline-flex h-6 w-6 items-center justify-center rounded-full border-2 border-gray-900 bg-red-500 text-xs font-bold text-white">
                         {data}

@@ -9,7 +9,7 @@ export const authRouter = createTRPCRouter({
     const response = await supabase.auth.signUp({
       email: input.email,
       password: input.password,
-      options: { data: { username: input.username, confirmed: false, canConfirm: true } }
+      options: { data: { username: input.username, confirmed: false, canConfirm: false } }
     });
     if (response.error) {
       console.log(response.error.message);

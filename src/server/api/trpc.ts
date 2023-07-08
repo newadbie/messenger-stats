@@ -36,12 +36,12 @@ export const createTRPCRouter = t.router;
 
 export const publicProcedure = t.procedure;
 
-const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
-  if (!ctx.session) {
+// Routes only for admin
+const enforceUserIsAdmin = t.middleware(({ ctx, next }) => {
+  if (!ctx.session || !ctx.session.user.user_metadata.canConfirm) {
     throw new TRPCError({ code: 'UNAUTHORIZED' });
   }
-
   return next({ ctx: { session: ctx.session } });
 });
 
-export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
+export const adminProcedure = t.procedure.use(enforceUserIsAdmin);

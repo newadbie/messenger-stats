@@ -31,7 +31,6 @@ export default async function Stats() {
     return <h1>Jeszcze tu nic nie ma</h1>;
   }
 
-  console.log(stats);
   return (
     <>
       <h1 className="mb-4">Statystyki</h1>
