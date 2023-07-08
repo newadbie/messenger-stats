@@ -6,17 +6,13 @@ await import("./src/env.mjs");
 /** @type {import("next").NextConfig} */
 const config = {
   reactStrictMode: true,
-  // async rewrites() {
-  //   return [
-  //     {
-  //       source: "/api/auth/:path*",
-  //       destination: `${env.SUPABASE_URL}/:path*`,
-  //     },
-  //   ];
-  // },
-  i18n: {
-    locales: ["en"],
-    defaultLocale: "en",
+  async rewrites() {
+    return [
+      {
+        source: "/api/auth/:path*",
+        destination: `${env.SUPABASE_URL}/:path*`,
+      },
+    ];
   },
 };
 
