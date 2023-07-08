@@ -2,8 +2,6 @@ import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { type Metadata } from 'next';
 import { cookies } from 'next/headers';
 
-import { prisma } from 'server/db';
-
 import AddForm from './AddForm';
 
 export const metadata: Metadata = {
@@ -14,12 +12,8 @@ export default async function AddPage() {
   const {
     data: { session }
   } = await supabase.auth.getSession();
-  const { can_confirm } = await prisma.userDetail.findUniqueOrThrow({
-    where: { userId: session?.user.id },
-    select: { can_confirm: true }
-  });
 
-  if (!can_confirm) {
+  if (!session?.user.user_metadata.canConfirm) {
     return (
       <>
         <h1>Nie masz uprawnień do tej strony</h1>

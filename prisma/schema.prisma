@@ -269,7 +269,6 @@ model User {
     identities                  identities[]
     mfaFactors                  mfa_factors[]
     sessions                    Session[]
-    userDetails                 UserDetail[]
     dataImports                 DataImport[]
 
     @@index([instance_id])
@@ -278,17 +277,6 @@ model User {
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model UserDetail {
-    id          BigInt    @id @default(autoincrement())
-    createdAt   DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
-    confirmed   Boolean   @default(false)
-    userId      String    @unique @map("user_id") @db.Uuid
-    can_confirm Boolean   @default(false)
-    user        User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-
-    @@map("user_details")
-    @@schema("public")
-}
 
 model DataImport {
     id    Int    @id @default(autoincrement())
@@ -313,7 +301,7 @@ model ParticipantDetail {
     createdAt DateTime @default(now()) @map("created_at") @db.Timestamp()
 
     importId Int        @map("import_id")
-    import   DataImport @relation(fields: [importId], references: [id])
+    import   DataImport @relation(fields: [importId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
     name              String
     messagesAmount    Int    @map("messages_amount")
@@ -332,7 +320,7 @@ model TopParticipant {
     createdAt DateTime @default(now()) @map("created_at") @db.Timestamp()
 
     importId Int        @map("import_id")
-    import   DataImport @relation(fields: [importId], references: [id])
+    import   DataImport @relation(fields: [importId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
     name      String
     photos    Boolean?

@@ -2,17 +2,13 @@
 
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
+
+import { useSession } from './SessionProvider';
 
 const Header: React.FC = () => {
-  const supabase = createClientComponentClient();
+  const session = useSession();
   const pathname = usePathname();
-  const router = useRouter();
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    router.refresh();
-  };
 
   return (
     <header>
@@ -20,6 +16,11 @@ const Header: React.FC = () => {
         <div className="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between px-4 py-2.5 md:px-6">
           <span className="whitespace-nowrap text-xl font-semibold text-white">Mess stats</span>
           <div className="flex items-center">
+            {session.user.user_metadata.canConfirm && (
+              <Link className="text-sm font-medium text-primary-500 hover:underline sm:mr-6" href="/potwierdz-nowych">
+                Potwierdź nowych
+              </Link>
+            )}
             {pathname !== '/statystyki' ? (
               <Link href="/statystyki" className="text-sm font-medium text-primary-500 hover:underline sm:mr-6">
                 Statystyki
@@ -32,12 +33,9 @@ const Header: React.FC = () => {
                 Dodaj JSON
               </Link>
             )}
-            <button
-              onClick={handleSignOut}
-              className="hidden text-sm font-medium text-primary-500 hover:underline sm:inline"
-            >
-              Wyloguj
-            </button>
+            <form action="/api/auth/signout" method="post">
+              <button className="hidden text-sm font-medium text-primary-500 hover:underline sm:inline">Wyloguj</button>
+            </form>
           </div>
         </div>
       </nav>

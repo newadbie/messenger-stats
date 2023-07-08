@@ -1,27 +1,20 @@
-import {
-  createRouteHandlerClient,
-  type SupabaseClient,
-} from "@supabase/auth-helpers-nextjs";
-import { initTRPC, TRPCError } from "@trpc/server";
-import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
-import { cookies } from "next/headers";
-import { type NextRequest } from "next/server";
-import superjson from "superjson";
-import { ZodError } from "zod";
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { initTRPC } from '@trpc/server';
+import { cookies } from 'next/headers';
+import superjson from 'superjson';
+import { ZodError } from 'zod';
 
-type CreateContextOptions = {
-  //can be null
-  supabase: SupabaseClient;
-};
+import { prisma } from 'server/db';
 
-const createInnerTRPCContext = (opts: CreateContextOptions) => {
-  return opts;
-};
-
-export const createTRPCContext = (_req: NextRequest) => {
+export const createTRPCContext = async () => {
   try {
     const supabase = createRouteHandlerClient({ cookies });
-    return createInnerTRPCContext({ supabase });
+    const session = await supabase.auth.getSession();
+    if (!session.data.session?.user.id) {
+      return { supabase, prisma, session: null };
+    }
+    const userDetails = await prisma.userDetail.findUnique({ where: { userId: session.data.session.user.id } });
+    return { supabase, prisma, session: { ...session.data.session.user, ...userDetails } };
   } catch (e) {
     throw e;
   }
@@ -34,11 +27,10 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
       ...shape,
       data: {
         ...shape.data,
-        zodError:
-          error.cause instanceof ZodError ? error.cause.flatten() : null,
-      },
+        zodError: error.cause instanceof ZodError ? error.cause.flatten() : null
+      }
     };
-  },
+  }
 });
 
 export const createTRPCRouter = t.router;
@@ -53,7 +45,7 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
     ctx: {
       // infers the `session` as non-nullable
       // session: { ...ctx.session, user: ctx.session.user },
-    },
+    }
   });
 });
 
