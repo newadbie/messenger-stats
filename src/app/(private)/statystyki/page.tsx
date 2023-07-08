@@ -27,9 +27,10 @@ const getStats = async () => {
 export default async function Stats() {
   const stats = await getStats();
 
-  if (!stats) {
+  if (!stats || stats.data.stats.length === 0) {
     return <h1>Jeszcze tu nic nie ma</h1>;
   }
+
   console.log(stats);
   return (
     <>

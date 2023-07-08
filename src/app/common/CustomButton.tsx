@@ -1,9 +1,9 @@
 'use client';
-import { Button } from 'flowbite-react';
+import { Button, type ButtonSizes } from 'flowbite-react';
 import Link from 'next/link';
 
-interface IProps {
-  text: string;
+interface Props {
+  text: string | React.ReactNode;
   type?: 'button' | 'submit' | 'reset';
   onClick?: () => void;
   className?: string;
@@ -11,6 +11,7 @@ interface IProps {
   variant?: 'default' | 'alternative' | 'dark' | 'light' | 'green' | 'red' | 'yellow' | 'purple';
   href?: string;
   loading?: boolean;
+  size?: 'xs' | 'sm' | 'lg' | 'xl';
   gradientDuoTone?:
     | 'cyanToBlue'
     | 'greenToBlue'
@@ -21,7 +22,7 @@ interface IProps {
     | 'tealToLime';
 }
 
-const CustomButton: React.FC<IProps> = ({
+const CustomButton: React.FC<Props> = ({
   text,
   onClick,
   variant = 'default',
@@ -30,12 +31,14 @@ const CustomButton: React.FC<IProps> = ({
   gradientDuoTone,
   outline,
   href,
-  loading
+  loading,
+  size
 }) => {
   if (!!href) {
     return (
       <Link legacyBehavior href={href}>
         <Button
+          size={size}
           gradientDuoTone={gradientDuoTone}
           color={variant === 'default' ? undefined : variant}
           className={className}
@@ -55,6 +58,7 @@ const CustomButton: React.FC<IProps> = ({
       color={variant === 'default' ? undefined : variant}
       className={className}
       onClick={onClick}
+      size={size}
       type={type}
       outline={outline}
     >
