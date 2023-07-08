@@ -1,16 +1,8 @@
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
-import { type UserMetadata } from '@supabase/supabase-js';
-import { Badge } from 'flowbite-react';
 import { type Metadata } from 'next';
 import { cookies } from 'next/headers';
-import { notFound } from 'next/navigation';
 import React from 'react';
 
-import CustomButton from 'app/common/CustomButton';
-import { prisma } from 'server/db';
-
-import ActionButtons from './ActionButtons';
-import StatusBadge from './StatusBadge';
 import UsersTable from './UsersTable';
 
 export const metadata: Metadata = {
