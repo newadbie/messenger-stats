@@ -16,7 +16,7 @@ const StatsTable: React.FC<Props> = ({ data }) => {
   const filteredData = useMemo(() => {
     if (!searchAuthor) return selectedData?.participantDetails;
     return selectedData?.participantDetails.filter((item) => item.name.includes(searchAuthor));
-  }, [searchAuthor, selectedData?.participantDetails]);
+  }, [searchAuthor, selectedData]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchWord(e.target.value);
