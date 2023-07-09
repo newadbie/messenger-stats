@@ -81,7 +81,7 @@ const CustomButton: React.FC<Props> = ({
               fill="currentColor"
             />
           </svg>
-          Ładowanie
+          {text}
         </>
       ) : (
         text

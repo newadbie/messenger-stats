@@ -11,6 +11,17 @@ interface Props {
 
 const StatsTable: React.FC<Props> = ({ data }) => {
   const [selectedData, setSelectedData] = useState(data[0]);
+  const [searchAuthor, setSearchWord] = useState('');
+
+  const filteredData = useMemo(() => {
+    if (!searchAuthor) return selectedData?.participantDetails;
+    return selectedData?.participantDetails.filter((item) => item.name.includes(searchAuthor));
+  }, [searchAuthor, selectedData?.participantDetails]);
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchWord(e.target.value);
+  };
+
   const dataToSelect = useMemo<CustomSelectOption[]>(
     () => data.map((item, index) => ({ label: item.title, value: `${index}` })),
     [data]
@@ -72,7 +83,7 @@ const StatsTable: React.FC<Props> = ({ data }) => {
             <div className="w-full md:w-1/2">
               <form className="flex items-center">
                 <label htmlFor="search" className="sr-only">
-                  Wyszukaj
+                  Wyszukaj autora
                 </label>
                 <div className="relative w-full">
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -94,7 +105,8 @@ const StatsTable: React.FC<Props> = ({ data }) => {
                     type="text"
                     id="search"
                     className="block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 pl-10 text-sm text-white placeholder-gray-400 focus:border-primary-500 focus:ring-primary-500"
-                    placeholder="Wyszukaj"
+                    placeholder="Wyszukaj autora"
+                    onChange={handleSearch}
                   />
                 </div>
               </form>
@@ -136,7 +148,7 @@ const StatsTable: React.FC<Props> = ({ data }) => {
                 </tr>
               </thead>
               <tbody>
-                {selectedData.participantDetails.map((participant, index) => (
+                {filteredData?.map((participant, index) => (
                   <tr className="border-b border-gray-700" key={index}>
                     <th className="whitespace-nowrap px-4 py-3 font-medium text-white">{participant.name}</th>
                     <td className="px-4 py-4">
