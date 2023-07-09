@@ -29,7 +29,7 @@ const StatsTable: React.FC<Props> = ({ data }) => {
 
   const handleChangeData = (option: CustomSelectOption) => {
     const index = parseInt(option.value);
-    if (!isNaN(index)) return;
+    if (isNaN(index)) return;
     setSelectedData(data[index]);
   };
 
