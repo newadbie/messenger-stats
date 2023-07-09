@@ -7,6 +7,7 @@ import AddForm from './AddForm';
 export const metadata: Metadata = {
   title: 'Dodaj statystyki'
 };
+
 export default async function AddPage() {
   const supabase = createServerComponentClient({ cookies });
   const {

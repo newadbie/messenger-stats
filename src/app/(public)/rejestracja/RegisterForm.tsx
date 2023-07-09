@@ -10,7 +10,7 @@ import { type RegisterSchema, registerSchema } from 'schemas/register';
 import { api } from 'utils/api';
 
 const RegisterForm: React.FC = () => {
-  const { mutate, isLoading } = api.auth.register.useMutation();
+  const { mutate, isLoading, isSuccess } = api.auth.register.useMutation();
 
   const methods = useForm<RegisterSchema>({
     resolver: zodResolver(registerSchema),
@@ -27,6 +27,19 @@ const RegisterForm: React.FC = () => {
       }
     });
   };
+
+  if (isSuccess) {
+    return (
+      <div className="mx-auto flex flex-grow flex-col justify-center gap-3">
+        <h1>Sukces</h1>
+        <div>
+          <p>Pomyślnie się zarejestrowano! Musisz jeszcze potwierdzić swoje konto</p>
+          <p>Na Twojego maila wysłaliśmy link potwierdzający.</p>
+        </div>
+        <CustomButton href="/" text="Wróć do logowania" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center justify-center px-6 py-8 md:h-screen lg:py-0">
