@@ -12,7 +12,7 @@ interface Props<T extends string = string> {
 }
 
 const FormDropzone = <T extends string = string>({ name, hideError, label, remove }: Props<T>): JSX.Element => {
-  const { field, formState } = useController({ name });
+  const { field, formState } = useController({ name: name as string });
   const errorMessage = formState.errors[name]?.message;
 
   const onDrop = useCallback(
