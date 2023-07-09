@@ -12,6 +12,7 @@ export interface StatsResponse {
 
 const getImport = () =>
   prisma.dataImport.findMany({
+    orderBy: { createdAt: 'desc' },
     select: {
       lastMessageDate: true,
       firstMessageDate: true,
