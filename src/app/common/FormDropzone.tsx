@@ -8,10 +8,11 @@ interface Props<T extends string = string> {
   name: T;
   label?: string;
   hideError?: boolean;
+  remove?: () => void;
 }
 
-const FormDropzone = <T extends string = string>({ name, hideError, label }: Props<T>): JSX.Element => {
-  const { field, formState } = useController({ name: name as string });
+const FormDropzone = <T extends string = string>({ name, hideError, label, remove }: Props<T>): JSX.Element => {
+  const { field, formState } = useController({ name });
   const errorMessage = formState.errors[name]?.message;
 
   const onDrop = useCallback(
@@ -25,7 +26,11 @@ const FormDropzone = <T extends string = string>({ name, hideError, label }: Pro
   );
 
   const handleRemoveFile = () => {
-    field.onChange(undefined);
+    if (remove) {
+      remove();
+    } else {
+      field.onChange(undefined);
+    }
   };
 
   const { getRootProps, getInputProps, isDragActive, acceptedFiles, fileRejections } = useDropzone({

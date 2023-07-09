@@ -120,6 +120,28 @@ const StatsTable: React.FC<Props> = ({ data }) => {
               />
             </div>
           </div>
+          <div className="px-4">
+            <h3>Największą ilość reakcji otrzymali:</h3>
+            <div className="flex flex-col items-center justify-between space-y-3 p-4 md:space-y-0">
+              {selectedData.topParticipants.map((participant) => (
+                <div
+                  key={participant.name}
+                  className="flex w-full flex-col border-b-2 border-b-slate-500 py-2 last:border-b-0"
+                >
+                  <span>
+                    Autor: <strong>{participant.name}</strong>
+                  </span>
+                  <span>
+                    Ilość reakcji: <strong>{participant.reactions}</strong>
+                  </span>
+                  <span>
+                    Zawartość:{' '}
+                    <strong>{participant.gifs ? 'Gif' : participant.photos ? 'Zdjęcie' : participant.content}</strong>
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
           <div className="overflow-x-auto lg:overflow-visible">
             <table className="v relative h-full w-full text-left text-sm text-gray-400">
               <thead className="sticky top-0 bg-gray-700 text-xs uppercase text-gray-400">

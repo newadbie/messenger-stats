@@ -9,9 +9,15 @@ import FormDropzone from 'app/common/FormDropzone';
 import FormInput from 'app/common/FormInput';
 import { type JsonAddInput, jsonAddSchema } from 'schemas/jsonAdd';
 
+import FormDropzoneFields from './FormDropzoneFields';
+
 const postAddJson = async (data: JsonAddInput) => {
   const formData = new FormData();
-  formData.append('file', data.file);
+  data.files.forEach(({ file }) => {
+    if (!file) return;
+    formData.append('files', file);
+  });
+
   formData.append('name', data.name);
 
   try {
@@ -29,6 +35,7 @@ const AddForm: React.FC = () => {
   const { mutate, isLoading } = useMutation(['/api/upload-json'], postAddJson);
   const methods = useForm<JsonAddInput>({
     resolver: zodResolver(jsonAddSchema),
+    defaultValues: { files: [{ file: undefined }] },
     mode: 'onBlur'
   });
 
@@ -49,7 +56,7 @@ const AddForm: React.FC = () => {
       <FormProvider {...methods}>
         <form onSubmit={methods.handleSubmit(onSubmit)} className="flex w-full flex-col space-y-4">
           <FormInput<keyof JsonAddInput> name="name" label="Tytuł importu" />
-          <FormDropzone<keyof JsonAddInput> name="file" />
+          <FormDropzoneFields />
           <CustomButton text="Wyślij" type="submit" className="mt-4" loading={isLoading} />
         </form>
       </FormProvider>
