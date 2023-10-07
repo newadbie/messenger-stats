@@ -147,6 +147,9 @@ const StatsTable: React.FC<Props> = ({ data }) => {
               <thead className="sticky top-0 bg-gray-700 text-xs uppercase text-gray-400">
                 <tr>
                   <th scope="col" className="px-4 py-3">
+                    Lp.
+                  </th>{' '}
+                  <th scope="col" className="px-4 py-3">
                     Imię i nazwisko
                   </th>
                   <th scope="col" className="px-4 py-3">
@@ -167,11 +170,15 @@ const StatsTable: React.FC<Props> = ({ data }) => {
                   <th scope="col" className="px-4 py-3">
                     K-words
                   </th>
+                  <th scope="col" className="px-4 py-3">
+                    S / W
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {filteredData?.map((participant, index) => (
                   <tr className="border-b border-gray-700" key={index}>
+                    <th className="whitespace-nowrap px-4 py-3 font-medium text-white">{index + 1}</th>
                     <th className="whitespace-nowrap px-4 py-3 font-medium text-white">{participant.name}</th>
                     <td className="px-4 py-4">
                       {participant.messagesAmount} (
@@ -197,6 +204,7 @@ const StatsTable: React.FC<Props> = ({ data }) => {
                       {participant.kWordAmount} (
                       {((participant.kWordAmount / (totals?.totalKWords ?? 0)) * 100).toFixed(2)}%)
                     </td>
+                    <td className="px-4 py-4">{(participant.numberOfWords / participant.messagesAmount).toFixed(2)}</td>
                   </tr>
                 ))}
               </tbody>
